@@ -4,6 +4,7 @@ import os
 import json
 import uuid
 from email_validator import validate_email, EmailNotValidError
+import pandas as pd
 
 st.title("🧠 Admin Dashboard")
 
@@ -47,6 +48,40 @@ for key_file in key_files:
     with open(f"data/answer_keys/{key_file}", "r") as f:
         key_data = json.load(f)
         st.json(key_data)
+
+st.subheader("📊 Filter Logs")
+
+# Load logs
+logs = logger.get_logs()
+if logs:
+    columns = [
+        "ID", "Timestamp", "Evaluator Name", "Evaluator ID",
+        "Subject", "Set Number", "Score", "PDF Generated", "PDF Sent"
+    ]
+    df = pd.DataFrame(logs, columns=columns)
+
+    # Filters
+    with st.expander("🔍 Filter Options"):
+        subject_filter = st.multiselect("Subject", df["Subject"].unique())
+        evaluator_filter = st.multiselect("Evaluator", df["Evaluator Name"].unique())
+        date_range = st.date_input("Date Range", [])
+
+        filtered_df = df.copy()
+
+        if subject_filter:
+            filtered_df = filtered_df[filtered_df["Subject"].isin(subject_filter)]
+        if evaluator_filter:
+            filtered_df = filtered_df[filtered_df["Evaluator Name"].isin(evaluator_filter)]
+        if len(date_range) == 2:
+            start, end = [d.strftime("%Y-%m-%d") for d in date_range]
+            filtered_df = filtered_df[
+                filtered_df["Timestamp"].str[:10].between(start, end)
+            ]
+
+    st.dataframe(filtered_df, use_container_width=True)
+else:
+    st.info("No logs found.")
+
 
 # 👥 User Management
 st.subheader("👥 Register New User")
