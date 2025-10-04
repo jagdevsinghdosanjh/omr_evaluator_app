@@ -1,0 +1,26 @@
+# 🐍 Python
+__pycache__/
+*.pyc
+
+# 🔐 Environment & Secrets
+.env
+.streamlit/secrets.toml
+
+# 📊 Data Files
+data/logs.db
+data/submissions/
+data/answer_keys/
+
+# 🖼️ Assets
+assets/sample_omr.jpg
+assets/logo.png
+
+# 📄 PDFs
+*.pdf
+
+# 🖥️ OS Artifacts
+.DS_Store
+Thumbs.db
+
+# Template is safe to commit, actual secrets are not
+!.streamlit/secrets_template.toml

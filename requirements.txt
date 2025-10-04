@@ -1,0 +1,10 @@
+streamlit
+opencv-python
+numpy
+pandas
+python-dotenv
+bcrypt
+email-validator
+reportlab
+Pillow
+twilio

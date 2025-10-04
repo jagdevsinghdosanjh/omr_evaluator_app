@@ -1,0 +1,77 @@
+/* Typography */
+body, html {
+  font-family: 'Segoe UI', sans-serif;
+  color: #222;
+  background-color: #f9f9fc;
+}
+
+/* Headings */
+h1, h2, h3 {
+  color: #2c3e50;
+  margin-bottom: 0.5em;
+}
+
+/* Buttons */
+button, .stButton button {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 0.6em 1.2em;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:hover, .stButton button:hover {
+  background-color: #45a049;
+}
+
+/* Containers */
+.stContainer {
+  padding: 1em;
+  border-radius: 8px;
+  background-color: #ffffff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+/* Success and Error */
+.stAlert-success {
+  background-color: #e6ffed;
+  border-left: 6px solid #2ecc71;
+}
+
+.stAlert-error {
+  background-color: #ffe6e6;
+  border-left: 6px solid #e74c3c;
+}
+
+/* Custom Badge */
+.badge {
+  display: inline-block;
+  padding: 0.4em 0.8em;
+  background-color: #3498db;
+  color: white;
+  border-radius: 12px;
+  font-size: 0.9em;
+  margin-right: 0.5em;
+}
+
+/* Splash screen styling */
+.splash {
+  text-align: center;
+  padding: 3em;
+  background: linear-gradient(to right, #6dd5fa, #2980b9);
+  color: white;
+  border-radius: 12px;
+  margin-bottom: 2em;
+}
+
+.splash h1 {
+  font-size: 2.5em;
+  margin-bottom: 0.5em;
+}
+
+.splash p {
+  font-size: 1.2em;
+  opacity: 0.9;
+}
