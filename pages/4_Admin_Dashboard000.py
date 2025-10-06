@@ -41,39 +41,15 @@ if uploaded_key and st.button("💾 Save Answer Key"):
     st.success(f"✅ Answer key saved for {subject} - {set_number}")
 
 # 📚 View Existing Answer Keys
-# 📚 View Existing Answer Keys (Tabular Format)
 st.subheader("📚 Existing Answer Keys")
-
 key_files = os.listdir("data/answer_keys")
 for key_file in key_files:
-    st.markdown(f"### 📘 `{key_file}`")
-    try:
-        with open(f"data/answer_keys/{key_file}", "r") as f:
-            key_data = json.load(f)
+    st.markdown(f"- `{key_file}`")
+    with open(f"data/answer_keys/{key_file}", "r") as f:
+        key_data = json.load(f)
+        st.json(key_data)
 
-        # Convert to DataFrame
-        if isinstance(key_data, dict):
-            df = pd.DataFrame(list(key_data.items()), columns=["Question", "Correct Answer"])
-        elif isinstance(key_data, list):
-            df = pd.DataFrame(key_data)
-        else:
-            st.warning("Unsupported answer key format.")
-            continue
-
-        st.dataframe(df, use_container_width=True)
-
-    except Exception as e:
-        st.error(f"Error loading `{key_file}`: {e}")
-
-# st.subheader("📚 Existing Answer Keys")
-# key_files = os.listdir("data/answer_keys")
-# for key_file in key_files:
-#     st.markdown(f"- `{key_file}`")
-#     with open(f"data/answer_keys/{key_file}", "r") as f:
-#         key_data = json.load(f)
-#         st.json(key_data)
-
-# st.subheader("📊 Filter Logs")
+st.subheader("📊 Filter Logs")
 
 # Load logs
 logs = logger.get_logs()
