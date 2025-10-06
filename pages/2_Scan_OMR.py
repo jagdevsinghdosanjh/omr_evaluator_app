@@ -18,7 +18,8 @@ set_number = st.selectbox("Select question set", ["Set 1", "Set 2", "Set 3"])
 
 # --- Process and Compare ---
 if uploaded_file and subject and set_number:
-    st.image(uploaded_file, caption="Uploaded OMR Sheet", use_column_width=True)
+    st.image(uploaded_file, caption="Uploaded OMR Sheet", use_container_width=True)
+    # st.image(uploaded_file, caption="Uploaded OMR Sheet", use_column_width=True)
 
     if st.button("🧩 Process and Compare"):
         try:
