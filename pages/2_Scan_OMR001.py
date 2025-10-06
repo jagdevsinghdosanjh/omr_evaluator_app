@@ -19,6 +19,7 @@ set_number = st.selectbox("Select question set", ["Set 1", "Set 2", "Set 3"])
 # --- Process and Compare ---
 if uploaded_file and subject and set_number:
     st.image(uploaded_file, caption="Uploaded OMR Sheet", use_container_width=True)
+    # st.image(uploaded_file, caption="Uploaded OMR Sheet", use_column_width=True)
 
     if st.button("🧩 Process and Compare"):
         try:
@@ -30,7 +31,7 @@ if uploaded_file and subject and set_number:
                 st.stop()
 
             # Step 2: Load answer key
-            answer_key_path = f"data/answer_keys/{subject.lower()}_{set_number.lower().replace(' ', '_')}.json"
+            answer_key_path = f"data/answer_keys/{subject.lower()}_{set_number.lower()}.json"
             if not os.path.exists(answer_key_path):
                 st.error("Answer key not found.")
                 st.stop()
@@ -41,37 +42,16 @@ if uploaded_file and subject and set_number:
             result = answer_comparator.compare_answers(detected_answers, correct_answers)
             summary = result_generator.generate_summary(result)
 
-            # Persist result in session state
-            st.session_state["result_summary"] = summary
-            st.session_state["subject"] = subject
-            st.session_state["set_number"] = set_number
-
             st.success("✅ Result generated successfully.")
-            st.json(summary)
+            st.write(summary)
+
+            # Step 4: Optional PDF Download
+            if st.button("📥 Download Result PDF"):
+                pdf_bytes = result_generator.generate_pdf(summary, subject, set_number)
+                st.download_button("Download PDF", data=pdf_bytes, file_name="result.pdf", mime="application/pdf")
 
         except ValueError as ve:
             st.error(f"OMR processing error: {ve}")
         except Exception as e:
             st.error("Unexpected error during OMR processing.")
-            st.text(f"Debug info: {e}")
-
-# --- PDF Download Section ---
-if "result_summary" in st.session_state:
-    st.markdown("---")
-    st.subheader("📥 Export Result")
-    if st.button("Download Result PDF"):
-        try:
-            pdf_bytes = result_generator.generate_pdf(
-                st.session_state["result_summary"],
-                st.session_state["subject"],
-                st.session_state["set_number"]
-            )
-            st.download_button(
-                label="Download PDF",
-                data=pdf_bytes,
-                file_name="result.pdf",
-                mime="application/pdf"
-            )
-        except Exception as e:
-            st.error("PDF generation failed.")
             st.text(f"Debug info: {e}")
