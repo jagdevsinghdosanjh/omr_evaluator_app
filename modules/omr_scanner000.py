@@ -1,8 +1,7 @@
 import cv2
 import numpy as np
-from PIL import Image # noqa
+from PIL import Image
 import tempfile
-import os
 
 def extract_answers(uploaded_file):
     # Step 1: Convert uploaded image to OpenCV format
@@ -11,30 +10,19 @@ def extract_answers(uploaded_file):
         tmp_path = tmp.name
 
     image = cv2.imread(tmp_path)
-    if image is None:
-        raise ValueError("Failed to load image. Ensure the file is a valid image format.")
-
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     blurred = cv2.GaussianBlur(gray, (5, 5), 0)
-    _, thresh = cv2.threshold(blurred, 150, 255, cv2.THRESH_BINARY_INV)
+    thresh = cv2.threshold(blurred, 150, 255, cv2.THRESH_BINARY_INV)[1]
 
     # Step 2: Detect contours (bubbles)
-    contours_info = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    if len(contours_info) < 2:
-        raise ValueError("Contour extraction failed: insufficient return values.")
-
-    contours = contours_info[-2]  # Compatible with OpenCV 3 and 4
-    bubbles = [cnt for cnt in contours if 100 < cv2.contourArea(cnt) < 1000]
-
-    if not bubbles:
-        raise ValueError("No valid bubbles detected. Check scan quality or threshold settings.")
+    contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    bubbles = [cnt for cnt in contours if cv2.contourArea(cnt) > 100 and cv2.contourArea(cnt) < 1000]
 
     # Step 3: Sort bubbles top-to-bottom, left-to-right
     def sort_contours(cnts):
         bounding_boxes = [cv2.boundingRect(c) for c in cnts]
-        sorted_pairs = sorted(zip(cnts, bounding_boxes), key=lambda b: (b[1][1], b[1][0]))
-        sorted_cnts = [cnt for cnt, _ in sorted_pairs]
-        return sorted_cnts
+        cnts, _ = zip(*sorted(zip(cnts, bounding_boxes), key=lambda b: (b[1][1], b[1][0])))
+        return cnts
 
     sorted_bubbles = sort_contours(bubbles)
 
@@ -45,9 +33,6 @@ def extract_answers(uploaded_file):
 
     for i in range(0, len(sorted_bubbles), 4):
         group = sorted_bubbles[i:i+4]
-        if len(group) < 4:
-            continue  # Skip incomplete question groups
-
         filled = None
         for j, cnt in enumerate(group):
             mask = np.zeros(thresh.shape, dtype="uint8")
@@ -55,11 +40,7 @@ def extract_answers(uploaded_file):
             total = cv2.countNonZero(cv2.bitwise_and(thresh, thresh, mask=mask))
             if total > 200:  # Threshold for filled bubble
                 filled = options[j]
-
         answers[f"Q{question_number}"] = filled if filled else "Unmarked"
         question_number += 1
-
-    # Cleanup temp file
-    os.remove(tmp_path)
 
     return answers
